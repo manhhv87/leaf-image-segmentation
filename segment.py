@@ -125,8 +125,9 @@ if __name__ == '__main__':
 
     if args.destination:
         if not os.path.isdir(args.destination):
-            print(args.destination, ': is not a directory')
-            exit()
+            os.makedirs(args.destination, exist_ok=True)
+            # print(args.destination, ': is not a directory')
+            # exit()
 
     # set up files to be segmented and destination place for segmented output
     if os.path.isdir(args.image_source):
