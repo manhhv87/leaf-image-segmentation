@@ -115,7 +115,7 @@ if __name__ == '__main__':
                              'If not specified destination directory will be input image directory')
     parser.add_argument('-o', '--with_original', action='store_true',
                         help='Segmented output will be appended horizontally to the original image')
-    parser.add_argument('sr', '--image_source', help='A path of image filename or folder containing images')
+    parser.add_argument('-src', '--image_source', help='A path of image filename or folder containing images')
     
     # set up command line arguments conveniently
     args = parser.parse_args()
