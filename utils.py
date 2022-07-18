@@ -15,7 +15,7 @@ def read_image(file_path, read_mode=cv2.IMREAD_COLOR):
 
     Args:
         file_path: absolute file_path of an image file
-        read_mode: whether image reading mode is rgb, grayscale or somethin
+        read_mode: whether image reading mode is rgb, grayscale or something
 
     Returns:
         np.ndarray of the read image or None if couldn't read
