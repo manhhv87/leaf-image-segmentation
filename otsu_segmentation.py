@@ -18,7 +18,8 @@ def get_marker(image):
 
     return ret_val, image_marker
 
-def apply_marker(image, marker, background = 0, inverse = True):
+
+def apply_marker(image, marker, background=0, inverse=True):
     """
     Apply marker on original image
     Args:
@@ -49,7 +50,8 @@ def apply_marker(image, marker, background = 0, inverse = True):
 
     return new_image
 
-def segment_with_otsu(image_file, background = 0):
+
+def segment_with_otsu(image_file, background=0):
     """
     Segment an image file using otsu thresholding
     Args:
@@ -61,7 +63,7 @@ def segment_with_otsu(image_file, background = 0):
         segmented_image: in ndarray form
     """
     image = read_image(image_file, cv2.IMREAD_GRAYSCALE)
-    
+
     ret_val, marker = get_marker(image)
     segmented_image = apply_marker(image, marker, background)
 

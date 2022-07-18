@@ -46,13 +46,14 @@ def show_review(original_image, image, image_title, hist_val=None, gray=False):
     print('plt showwing')
     plt.show()
 
+
 def review_marker(file_name):
     try:
-        original_image = read_image(file_name)            
+        original_image = read_image(file_name)
         ret_val, marker = get_marker(original_image)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)  
+            print('Error: Couldnot read image file: ', file_name)
         else:
             raise
     else:
@@ -61,7 +62,7 @@ def review_marker(file_name):
 
 def review_segmentation(file_name):
     try:
-        original_image = read_image(file_name)        
+        original_image = read_image(file_name)
         ret_val, segmented_image = segment_with_otsu(file_name)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
@@ -254,12 +255,12 @@ def review_folder(folder):
     ext = re.compile('(\.jpe?g)|(\.png)$', re.I)
     for subdir, dirs, files in os.walk(folder):
         for file in files:
-            comm  = input('Continue: ')
+            comm = input('Continue: ')
             if comm == 'q':
                 break
             if ext.search(file):
-                print('file', os.path.join(folder,file))
-                review_index_marker(os.path.join(folder,file))
+                print('file', os.path.join(folder, file))
+                review_index_marker(os.path.join(folder, file))
             else:
                 print('Warning: {} doesnt have valid image extension.'.format(file))
 
