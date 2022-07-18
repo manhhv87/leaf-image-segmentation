@@ -56,15 +56,13 @@ def segment_leaf(image_file, filling_mode, smooth_boundary, marker_intensity):
     # get background marker and original image
     original, marker = generate_background_marker(image_file)
 
-    # set up binary image for futher processing
+    # set up binary image for further processing
     bin_image = np.zeros((original.shape[0], original.shape[1]))
     bin_image[marker] = 255
     bin_image = bin_image.astype(np.uint8)
 
     # further processing of image, filling holes, smoothing edges
-    largest_mask = \
-        select_largest_obj(bin_image, fill_mode=filling_mode,
-                           smooth_boundary=smooth_boundary)
+    largest_mask = select_largest_obj(bin_image, fill_mode=filling_mode, smooth_boundary=smooth_boundary)
 
     if marker_intensity > 0:
         largest_mask[largest_mask != 0] = marker_intensity
@@ -94,7 +92,7 @@ def rgb_range(arg):
     try:
         value = int(arg)
     except ValueError as err:
-       raise argparse.ArgumentTypeError(str(err))
+        raise argparse.ArgumentTypeError(str(err))
 
     if value < 0 or value > 255:
         message = "Expected 0 <= value <= 255, got value = {}".format(value)
@@ -104,14 +102,13 @@ def rgb_range(arg):
 
 
 if __name__ == '__main__':
-    # handle command line arguments
     parser = argparse.ArgumentParser('segment')
+
     parser.add_argument('-m', '--marker_intensity', type=rgb_range, default=0,
                         help='Output image will be as black background and foreground '
                              'with integer value specified here')
     parser.add_argument('-f', '--fill', choices=['no', 'flood', 'threshold', 'morph'],
-                        help='Change hole filling technique for holes appearing in segmented output',
-                        default='flood')
+                        help='Change hole filling technique for holes appearing in segmented output', default='flood')
     parser.add_argument('-s', '--smooth', action='store_true',
                         help='Output image with smooth edges')
     parser.add_argument('-d', '--destination',
@@ -125,6 +122,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     filling_mode = FILL[args.fill.upper()]
     smooth = True if args.smooth else False
+
     if args.destination:
         if not os.path.isdir(args.destination):
             print(args.destination, ': is not a directory')
@@ -158,8 +156,8 @@ if __name__ == '__main__':
     for file in files:
         try:
             # read image and segment leaf
-            original, output_image = \
-                segment_leaf(os.path.join(base_folder, file), filling_mode, smooth, args.marker_intensity)
+            original, output_image = segment_leaf(os.path.join(base_folder, file),
+                                                  filling_mode, smooth, args.marker_intensity)
 
         except ValueError as err:
             if str(err) == IMAGE_NOT_READ:
@@ -168,9 +166,10 @@ if __name__ == '__main__':
                 print('Error: Not color image file: ', file)
             else:
                 raise
+
         # if no error when segmenting write segmented output
         else:
-            # handle destination folder and fileaname
+            # handle destination folder and filename
             filename, ext = os.path.splitext(file)
             if args.with_original:
                 new_filename = filename + '_marked_merged' + ext
@@ -188,4 +187,3 @@ if __name__ == '__main__':
             else:
                 cv2.imwrite(new_filename, output_image)
             print('Marker generated for image file: ', file)
-

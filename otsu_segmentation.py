@@ -38,9 +38,9 @@ def apply_marker(image, marker, background=0, inverse=True):
     mask = marker.astype(bool)
     unique, counts = np.unique(mask, return_counts=True)
     unique_counts = dict(zip(unique, counts))
-    # needs enhancment here, if difference is not much inverse
+    # needs enhancement here, if difference is not much inverse
     # so that it will not segment the background rather than the leaf
-    # 2000000 number should be enchanced(found empirically, with 8 images, bad)
+    # 2000000 number should be enhanced (found empirically, with 8 images, bad)
     if inverse and unique_counts[True] - unique_counts[False] < 2000000:
         mask = np.logical_not(mask)
 

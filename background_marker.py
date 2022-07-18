@@ -30,13 +30,13 @@ def remove_whites(image, marker):
     white_remover = np.full((image.shape[0], image.shape[1]), True)
 
     # below line same as: white_remover = np.logical_and(white_remover,  image[:, :, 0] > 200)
-    white_remover[image[:, :, 0] <= 200] = False # blue channel
+    white_remover[image[:, :, 0] <= 200] = False    # blue channel
 
     # below line same as: white_remover = np.logical_and(white_remover,  image[:, :, 1] > 220)
-    white_remover[image[:, :, 1] <= 220] = False  # green channel
+    white_remover[image[:, :, 1] <= 220] = False    # green channel
 
     # below line same as: white_remover = np.logical_and(white_remover,  image[:, :, 2] > 200)
-    white_remover[image[:, :, 2] <= 200] = False  # red channel
+    white_remover[image[:, :, 2] <= 200] = False    # red channel
 
     # remove whites from marker
     marker[white_remover] = False
@@ -56,7 +56,7 @@ def remove_blacks(image, marker):
     black_remover = np.full((image.shape[0], image.shape[1]), True)
 
     # below line same as: black_remover = np.logical_and(black_remover,  image[:, :, 0] < 30)
-    black_remover[image[:, :, 0] >= 30] = False  # blue channel
+    black_remover[image[:, :, 0] >= 30] = False # blue channel
 
     # below line same as: black_remover = np.logical_and(black_remover,  image[:, :, 1] < 30)
     black_remover[image[:, :, 1] >= 30] = False  # green channel
@@ -132,7 +132,7 @@ def texture_filter(image, marker, threshold=220, window=3):
 
 
 def otsu_color_index(excess_green, excess_red):
-    return cv2.threshold(excess_green - excess_red, 0, 255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return cv2.threshold(excess_green - excess_red, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
 
 def generate_floodfill_mask(bin_image):
@@ -145,12 +145,8 @@ def generate_floodfill_mask(bin_image):
     Returns:
         a mask to backgrounds adjacent to image edge
     """
-    y_mask = np.full(
-        (bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8
-    )
-    x_mask = np.full(
-        (bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8
-    )
+    y_mask = np.full((bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8)
+    x_mask = np.full((bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8)
 
     xs, ys = bin_image.shape[0], bin_image.shape[1]
 
@@ -202,8 +198,7 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
     """
 
     # set up components
-    n_labels, img_labeled, lab_stats, _ = \
-        cv2.connectedComponentsWithStats(img_bin, connectivity=8, ltype=cv2.CV_32S)
+    n_labels, img_labeled, lab_stats, _ = cv2.connectedComponentsWithStats(img_bin, connectivity=8, ltype=cv2.CV_32S)
 
     # find largest component label(label number works with labeled image because of +1)
     largest_obj_lab = np.argmax(lab_stats[1:, 4]) + 1
@@ -215,7 +210,7 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
     if fill_mode == FILL['FLOOD']:
         # fill holes using opencv floodfill function
 
-        # set up seedpoint(starting point) for floodfill
+        # set up seed point (starting point) for floodfill
         bkg_locs = np.where(img_labeled == 0)
         bkg_seed = (bkg_locs[0][0], bkg_locs[1][0])
 
@@ -226,8 +221,7 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
         h_, w_ = largest_mask.shape
         mask_ = np.zeros((h_ + 2, w_ + 2), dtype=np.uint8)
 
-        cv2.floodFill(img_floodfill, mask_, seedPoint=bkg_seed,
-                    newVal=lab_val)
+        cv2.floodFill(img_floodfill, mask_, seedPoint=bkg_seed, newVal=lab_val)
         holes_mask = cv2.bitwise_not(img_floodfill)  # mask of the holes.
 
         # get a mask to avoid filling non-holes that are adjacent to image edge
@@ -238,12 +232,11 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
     elif fill_mode == FILL['MORPH']:
         # fill holes using closing morphology operation
         kernel_ = np.ones((50, 50), dtype=np.uint8)
-        largest_mask = cv2.morphologyEx(largest_mask, cv2.MORPH_CLOSE,
-                                        kernel_)
+        largest_mask = cv2.morphologyEx(largest_mask, cv2.MORPH_CLOSE, kernel_)
     elif fill_mode == FILL['THRESHOLD']:
         # fill background-holes based on hole size threshold
         # default hole size threshold is some percentage
-        #   of size of the largest component(i.e leaf component)
+        # of size of the largest component(i.e leaf component)
 
         # invert to setup holes of background, sorry for the incovenience
         inv_img_bin = np.bitwise_not(largest_mask)
@@ -264,10 +257,10 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
         inv_max_side = np.amax(inv_img_labeled.shape)
 
         # set the minimum size of hole that is allowed to stay
-        inv_min_size = int(0.3 * sizes[largest_obj_lab - 1]) # todo: specify good min size
+        inv_min_size = int(0.3 * sizes[largest_obj_lab - 1])    # todo: specify good min size
 
         # generate the mask that allows holes greater than minimum size(weird)
-        inv_mask = np.zeros((inv_img_labeled.shape), dtype=np.uint8)
+        inv_mask = np.zeros(inv_img_labeled.shape, dtype=np.uint8)
         for inv_i in range(0, inv_nb_components):
             if inv_sizes[inv_i] >= inv_min_size:
                 inv_mask[inv_img_labeled == inv_i + 1] = 255
@@ -277,8 +270,7 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
     if smooth_boundary:
         # smooth edge boundary
         kernel_ = np.ones((kernel_size, kernel_size), dtype=np.uint8)
-        largest_mask = cv2.morphologyEx(largest_mask, cv2.MORPH_OPEN,
-                                        kernel_)
+        largest_mask = cv2.morphologyEx(largest_mask, cv2.MORPH_OPEN, kernel_)
 
     return largest_mask
 

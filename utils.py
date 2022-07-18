@@ -52,7 +52,7 @@ def div0(a, b):
     """ ignore / 0, div0( [-1, 0, 1], 0 ) -> [0, 0, 0] """
     with np.errstate(divide='ignore', invalid='ignore'):
         q = np.true_divide(a, b)
-        q[ ~ np.isfinite(q) ] = 0  # -inf inf NaN
+        q[~ np.isfinite(q)] = 0  # -inf inf NaN
 
     return q
 
@@ -119,7 +119,7 @@ def index_diff(image, green_scale=2.0, red_scale=1.4):
     reds = div0(image[:, :, 2], bgr_sum)
 
     green_index = green_scale * greens - (reds + blues)
-    red_index = red_scale * reds - (greens)
+    red_index = red_scale * reds - greens
 
     return green_index - red_index
 

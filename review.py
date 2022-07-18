@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 
 from utils import *
 from otsu_segmentation import *
+from background_marker import *
 
 files = {
     "jpg1": "testing_files/apple_healthy.jpg",
@@ -14,8 +15,6 @@ files = {
     "jpg8": "testing_files/jpg8.jpg",
 }
 
-from background_marker import *
-
 
 def show_review(original_image, image, image_title, hist_val=None, gray=False):
     if hist_val is None:
@@ -23,11 +22,12 @@ def show_review(original_image, image, image_title, hist_val=None, gray=False):
     else:
         plot_nums = 3
 
-    cmap = 'gray' if gray else None
+    cmp = 'gray' if gray else None
+
     # Original image plot
     original_image_show = original_image if gray else cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     plot_index = 1
-    plt.subplot(plot_nums, 1, plot_index), plt.imshow(original_image_show, cmap=cmap)
+    plt.subplot(plot_nums, 1, plot_index), plt.imshow(original_image_show, cmap=cmp)
     plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 
     # Histogram plot
@@ -40,42 +40,42 @@ def show_review(original_image, image, image_title, hist_val=None, gray=False):
     # Processed image plot
     image_show = image if gray else cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     plot_index += 1
-    plt.subplot(plot_nums, 1, plot_index), plt.imshow(image_show, cmap=cmap)
+    plt.subplot(plot_nums, 1, plot_index), plt.imshow(image_show, cmap=cmp)
     plt.title(image_title), plt.xticks([]), plt.yticks([])
 
-    print('plt showwing')
+    print('plt showing')
     plt.show()
 
 
-def review_marker(file_name):
+def review_marker(filename):
     try:
-        original_image = read_image(file_name)
+        original_image = read_image(filename)
         ret_val, marker = get_marker(original_image)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, marker, 'Otsu Thresholding Marker', ret_val)
 
 
-def review_segmentation(file_name):
+def review_segmentation(filename):
     try:
-        original_image = read_image(file_name)
-        ret_val, segmented_image = segment_with_otsu(file_name)
+        original_image = read_image(filename)
+        ret_val, segmented_image = segment_with_otsu(filename)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, segmented_image, 'Otsu Thresholding', ret_val, gray=True)
 
 
-def review_remove_whites(file_name):
+def review_remove_whites(filename):
     try:
-        original_image = read_image(file_name)
+        original_image = read_image(filename)
         ret_val = 0
 
         marker = np.full((original_image.shape[0], original_image.shape[1]), True)
@@ -87,19 +87,19 @@ def review_remove_whites(file_name):
         image[np.logical_not(marker)] = np.array([0, 0, 0])
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, image, 'Remove Reds')
 
 
-def review_remove_blacks(file_name):
+def review_remove_blacks(filename):
     try:
-        original_image = read_image(file_name)
-        ret_val = 0
+        original_image = read_image(filename)
+        # ret_val = 0
 
         marker = np.full((original_image.shape[0], original_image.shape[1]), True)
         remove_blacks(original_image, marker)
@@ -108,19 +108,19 @@ def review_remove_blacks(file_name):
         image[np.logical_not(marker)] = np.array([255, 255, 255])
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, image, 'Remove Blacks')
 
 
-def review_remove_blues(file_name):
+def review_remove_blues(filename):
     try:
-        original_image = read_image(file_name)
-        ret_val = 0
+        original_image = read_image(filename)
+        # ret_val = 0
 
         marker = np.full((original_image.shape[0], original_image.shape[1]), True)
         remove_blues(original_image, marker)
@@ -129,70 +129,70 @@ def review_remove_blues(file_name):
         image[np.logical_not(marker)] = np.array([0, 0, 0])
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, image, 'Remove Blues')
 
 
-def review_excess_green(file_name):
+def review_excess_green(filename):
     try:
-        original_image = read_image(file_name)
-        ret_val = 0
+        original_image = read_image(filename)
+        # ret_val = 0
 
         index = excess_green(original_image)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, index, 'Green Index')
 
 
-def review_excess_red(file_name):
+def review_excess_red(filename):
     try:
-        original_image = read_image(file_name)
-        ret_val = 0
+        original_image = read_image(filename)
+        # ret_val = 0
 
         index = excess_red(original_image)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, index, 'Red Index')
 
 
-def review_excess_diff(file_name):
+def review_excess_diff(filename):
     try:
         original_image = read_image(file_name)
-        ret_val = 0
+        # ret_val = 0
 
         index = index_diff(original_image)
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, index, 'Excess Diff')
 
 
-def review_index_marker(file_name, contrast=False):
+def review_index_marker(filename, contrast=False):
     try:
-        original_image = read_image(file_name)
-        ret_val = 0
+        original_image = read_image(filename)
+        # ret_val = 0
 
         marker = np.full((original_image.shape[0], original_image.shape[1]), True)
         color_index_marker(index_diff(original_image), marker)
@@ -203,32 +203,32 @@ def review_index_marker(file_name, contrast=False):
             image[marker] = np.array([255, 255, 255])
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, image, 'Index Marker')
 
 
-def review_otsu_index(file_name):
+def review_otsu_index(filename):
     try:
-        original_image = read_image(file_name)
+        original_image = read_image(filename)
         ret_val, image = otsu_color_index(excess_green(original_image), excess_red(original_image))
 
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
         show_review(original_image, image, 'Otsu for Index', ret_val)
 
 
-def review_texture_filter(file_name):
+def review_texture_filter(filename):
     try:
         original_image = read_image(file_name, cv2.IMREAD_GRAYSCALE)
 
@@ -240,9 +240,9 @@ def review_texture_filter(file_name):
         image[marker] = np.array([255])
     except ValueError as err:
         if str(err) == IMAGE_NOT_READ:
-            print('Error: Couldnot read image file: ', file_name)
+            print('Error: Could not read image file: ', filename)
         elif str(err) == NOT_COLOR_IMAGE:
-            print('Error: Not color image file: ', file_name)
+            print('Error: Not color image file: ', filename)
         else:
             raise
     else:
