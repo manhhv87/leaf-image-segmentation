@@ -113,10 +113,10 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--destination',
                         help='Destination directory for output image. '
                              'If not specified destination directory will be input image directory')
-    parser.add_argument('-o', '--with_original', action='store_true',
+    parser.add_argument('-o', '--with_original', type=int, choices=[0, 1], default=0,
                         help='Segmented output will be appended horizontally to the original image')
     parser.add_argument('-src', '--image_source', help='A path of image filename or folder containing images')
-    
+
     # set up command line arguments conveniently
     args = parser.parse_args()
 
@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
             # write the output
             if args.with_original:
-                cv2.imwrite(new_filename, np.hstack((original,output_image)))
+                cv2.imwrite(new_filename, np.hstack((original, output_image)))
             else:
                 cv2.imwrite(new_filename, output_image)
             print('Marker generated for image file: ', file)
