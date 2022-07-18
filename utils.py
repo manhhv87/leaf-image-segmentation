@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 
-
 # error message when image could not be read
 IMAGE_NOT_READ = 'IMAGE_NOT_READ'
 
@@ -15,7 +14,7 @@ def read_image(file_path, read_mode=cv2.IMREAD_COLOR):
 
     Args:
         file_path: absolute file_path of an image file
-        read_mode: whether image reading mode is rgb, grayscale or something
+        read_mode: whether image reading mode is rgb (cv2.IMREAD_COLOR), grayscale (cv2.IMREAD_GRAYSCALE) or something
 
     Returns:
         np.ndarray of the read image or None if couldn't read
@@ -23,6 +22,7 @@ def read_image(file_path, read_mode=cv2.IMREAD_COLOR):
     Raises:
         ValueError if image could not be read with message IMAGE_NOT_READ
     """
+
     # read image file in grayscale
     image = cv2.imread(file_path, read_mode)
 
@@ -44,12 +44,14 @@ def ensure_color(image):
     Raises:
         ValueError with message code if image is not colored
     """
+
     if len(image.shape) < 3:
         raise ValueError(NOT_COLOR_IMAGE)
 
 
 def div0(a, b):
     """ ignore / 0, div0( [-1, 0, 1], 0 ) -> [0, 0, 0] """
+
     with np.errstate(divide='ignore', invalid='ignore'):
         q = np.true_divide(a, b)
         q[~ np.isfinite(q)] = 0  # -inf inf NaN
@@ -57,7 +59,7 @@ def div0(a, b):
     return q
 
 
-def excess_green(image, scale = 2):
+def excess_green(image, scale=2):
     """
     Compute excess green index for colored image
 
@@ -99,7 +101,7 @@ def excess_red(image, scale=1.4):
 
     bgr_sum = np.sum(image, axis=2)
 
-    blues = div0(image[:, :, 0], bgr_sum)
+    # blues = div0(image[:, :, 0], bgr_sum)
     greens = div0(image[:, :, 1], bgr_sum)
     reds = div0(image[:, :, 2], bgr_sum)
 
@@ -109,7 +111,6 @@ def excess_red(image, scale=1.4):
 
 
 def index_diff(image, green_scale=2.0, red_scale=1.4):
-
     ensure_color(image)
 
     bgr_sum = np.sum(image, axis=2)
@@ -135,4 +136,3 @@ def debug(value, name=None):
 
         print("{} type: {}".format(name, type(value)))
         print("{}: {}".format(name, value))
-

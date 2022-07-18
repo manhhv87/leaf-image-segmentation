@@ -19,13 +19,15 @@ FILL = {
 def remove_whites(image, marker):
     """
     Remove pixels resembling white from marker as background
+
     Args:
-        image:
+        image: input image to remove
         marker: to be overloaded with white pixels to be removed
 
     Returns:
         nothing
     """
+
     # setup the white remover to process logical_and in place
     white_remover = np.full((image.shape[0], image.shape[1]), True)
 
@@ -45,13 +47,15 @@ def remove_whites(image, marker):
 def remove_blacks(image, marker):
     """
     Remove pixels resembling black from marker as background
+
     Args:
-        image:
+        image: input image to remove
         marker: to be overloaded with black pixels to be removed
 
     Returns:
         nothing
     """
+
     # setup the black remover to process logical_and in place
     black_remover = np.full((image.shape[0], image.shape[1]), True)
 
@@ -71,13 +75,15 @@ def remove_blacks(image, marker):
 def remove_blues(image, marker):
     """
     Remove pixels resembling blues better than green from marker as background
+
     Args:
-        image:
+        image: input image to remove
         marker: to be overloaded with blue pixels to be removed
 
     Returns:
         nothing
     """
+
     # choose pixels that have higher blue than green
     blue_remover = image[:, :, 0] > image[:, :, 1]
 
@@ -88,9 +94,9 @@ def remove_blues(image, marker):
 def color_index_marker(color_index_diff, marker):
     """
     Differentiate marker based on the difference of the color indexes
-    Threshold below some number(found empirically based on testing on 5 photos,bad)
-    If threshold number is getting less, more non-green image
-     will be included and vice versa
+    Threshold below some number (found empirically based on testing on 5 photos, bad)
+    If threshold number is getting less, more non-green image will be included and vice versa
+
     Args:
         color_index_diff: color index difference based on green index minus red index
         marker: marker to be updated
@@ -98,6 +104,7 @@ def color_index_marker(color_index_diff, marker):
     Returns:
         nothing
     """
+
     marker[color_index_diff <= -0.05] = False
 
 
@@ -112,9 +119,11 @@ def texture_filter(image, marker, threshold=220, window=3):
         window (int): window size of a square the texture computed from
 
     Returns: nothing
+
     """
 
     window = window - window//2 - 1
+
     for x in range(0, image.shape[0]):
         for y in range(0, image.shape[1]):
             # print('x y', x, y)
@@ -126,13 +135,14 @@ def texture_filter(image, marker, threshold=220, window=3):
 
             local_entropy = np.sum(image[x_start:x_stop, y_start:y_stop]
                                    * np.log(image[x_start:x_stop, y_start:y_stop] + 1e-07))
+
             # print('entropy', local_entropy)
             if local_entropy > threshold:
                 marker[x, y] = False
 
 
-def otsu_color_index(excess_green, excess_red):
-    return cv2.threshold(excess_green - excess_red, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+def otsu_color_index(exc_green, exc_red):
+    return cv2.threshold(exc_green - exc_red, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
 
 def generate_floodfill_mask(bin_image):
@@ -145,6 +155,7 @@ def generate_floodfill_mask(bin_image):
     Returns:
         a mask to backgrounds adjacent to image edge
     """
+
     y_mask = np.full((bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8)
     x_mask = np.full((bin_image.shape[0], bin_image.shape[1]), fill_value=255, dtype=np.uint8)
 
@@ -174,18 +185,16 @@ def generate_floodfill_mask(bin_image):
     return np.logical_or(x_mask, y_mask)
 
 
-def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
-                       smooth_boundary=False, kernel_size=15):
+def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'], smooth_boundary=False, kernel_size=15):
     """
-    Select the largest object from a binary image and optionally
-    fill holes inside it and smooth its boundary.
+    Select the largest object from a binary image and optionally fill holes inside it and smooth its boundary.
+
     Args:
         img_bin (2D array): 2D numpy array of binary image.
-        lab_val ([int]): integer value used for the label of the largest
-                object. Default is 255.
+        lab_val ([int]): integer value used for the label of the largest object. Default is 255.
         fill_mode (string {no,flood,threshold,morph}): hole filling techniques which are
             - no: no filling of holes
-            - flood: floodfilling technique without removing image edge sharing holes
+            - flood: flood filling technique without removing image edge sharing holes
             - threshold: removing holes based on minimum size of hole to be removed
             - morph: closing morphological operation with some kernel size to remove holes
         smooth_boundary ([boolean]): whether smooth the boundary of the
@@ -234,19 +243,18 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
         kernel_ = np.ones((50, 50), dtype=np.uint8)
         largest_mask = cv2.morphologyEx(largest_mask, cv2.MORPH_CLOSE, kernel_)
     elif fill_mode == FILL['THRESHOLD']:
-        # fill background-holes based on hole size threshold
-        # default hole size threshold is some percentage
-        # of size of the largest component(i.e leaf component)
+        # fill background-holes based on hole size threshold default hole size threshold
+        # is some percentage of size of the largest component(i.e leaf component)
 
-        # invert to setup holes of background, sorry for the incovenience
+        # invert to setup holes of background, sorry for the inconvenience
         inv_img_bin = np.bitwise_not(largest_mask)
 
         # set up components
         inv_n_labels, inv_img_labeled, inv_lab_stats, _ = \
             cv2.connectedComponentsWithStats(inv_img_bin, connectivity=8, ltype=cv2.CV_32S)
 
-        # find largest component label(label number works with labeled image because of +1)
-        inv_largest_obj_lab = np.argmax(inv_lab_stats[1:, 4]) + 1
+        # find largest component label (label number works with labeled image because of +1)
+        # inv_largest_obj_lab = np.argmax(inv_lab_stats[1:, 4]) + 1
 
         # setup sizes and number of components
         inv_sizes = inv_lab_stats[1:, -1]
@@ -254,13 +262,14 @@ def select_largest_obj(img_bin, lab_val=255, fill_mode=FILL['FLOOD'],
         inv_nb_components = inv_n_labels - 1
 
         # find the greater side of the image
-        inv_max_side = np.amax(inv_img_labeled.shape)
+        # inv_max_side = np.amax(inv_img_labeled.shape)
 
         # set the minimum size of hole that is allowed to stay
         inv_min_size = int(0.3 * sizes[largest_obj_lab - 1])    # todo: specify good min size
 
         # generate the mask that allows holes greater than minimum size(weird)
         inv_mask = np.zeros(inv_img_labeled.shape, dtype=np.uint8)
+
         for inv_i in range(0, inv_nb_components):
             if inv_sizes[inv_i] >= inv_min_size:
                 inv_mask[inv_img_labeled == inv_i + 1] = 255

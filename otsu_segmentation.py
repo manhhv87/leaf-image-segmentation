@@ -7,6 +7,7 @@ from utils import *
 def get_marker(image):
     """
     Get image marker to differentiate image background from foreground
+
     Args:
         image: image for which marker will be generated for
 
@@ -22,6 +23,7 @@ def get_marker(image):
 def apply_marker(image, marker, background=0, inverse=True):
     """
     Apply marker on original image
+
     Args:
         image: original image to be masked
         marker: one hot encoded with 0 and 255
@@ -38,9 +40,9 @@ def apply_marker(image, marker, background=0, inverse=True):
     mask = marker.astype(bool)
     unique, counts = np.unique(mask, return_counts=True)
     unique_counts = dict(zip(unique, counts))
-    # needs enhancement here, if difference is not much inverse
-    # so that it will not segment the background rather than the leaf
-    # 2000000 number should be enhanced (found empirically, with 8 images, bad)
+
+    # needs enhancement here, if difference is not much inverse so that it will not segment the background
+    # rather than the leaf 2000000 number should be enhanced (found empirically, with 8 images, bad)
     if inverse and unique_counts[True] - unique_counts[False] < 2000000:
         mask = np.logical_not(mask)
 
@@ -54,6 +56,7 @@ def apply_marker(image, marker, background=0, inverse=True):
 def segment_with_otsu(image_file, background=0):
     """
     Segment an image file using otsu thresholding
+
     Args:
         image_file: file path
         background: grayscale value to be set as background

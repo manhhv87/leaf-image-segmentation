@@ -6,13 +6,7 @@ from background_marker import *
 
 files = {
     "jpg1": "testing_files/apple_healthy.jpg",
-    "jpg2": "testing_files/apple_healthy_marked.jpg",
-    "jpg3": "testing_files/jpg3.jpg",
-    "jpg4": "testing_files/jpg4.jpg",
-    "jpg5": "testing_files/jpg5.jpg",
-    "jpg6": "testing_files/jpg6.jpg",
-    "jpg7": "testing_files/jpg7.jpg",
-    "jpg8": "testing_files/jpg8.jpg",
+    "gpg2": "testing_files/apple_black_rot.jpg"
 }
 
 
